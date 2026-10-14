@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SXX-2 会员店代购小程序 — Mockup v0.2</title>
+<style>
+  :root{
+    --brand:#07C160;          /* 微信绿，占位品牌色【待确认 Q-32】 */
+    --brand-dark:#06AD56;
+    --text:#1A1A1A;
+    --text-2:#5C5C5C;
+    --text-3:#8C8C8C;
+    --bg:#F5F6F7;
+    --surface:#FFFFFF;
+    --border:#E5E6E8;
+    --ok:#07C160;
+    --warn:#FF8F1F;
+    --err:#FA5151;
+    --focus:#0052D9;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+       color:var(--text);background:#fff;-webkit-font-smoothing:antialiased}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---------- 外壳 ---------- */
+  .shell{display:flex;min-height:100vh}
+  .side{width:230px;flex:0 0 230px;background:#Fafbfc;border-right:1px solid var(--border);padding:16px 12px;position:sticky;top:0;height:100vh;overflow:auto}
+  .side h1{font-size:15px;margin:0 0 4px}
+  .side .meta{font-size:12px;color:var(--text-3);margin-bottom:14px;line-height:1.6}
+  .side .grp{font-size:11px;color:var(--text-3);letter-spacing:.5px;margin:14px 0 6px;text-transform:uppercase}
+  .navbtn{display:block;width:100%;text-align:left;font:inherit;font-size:13px;color:var(--text);
+          background:transparent;border:0;border-radius:8px;padding:9px 10px;margin:2px 0;cursor:pointer;min-height:44px}
+  .navbtn:hover{background:#EFF1F3}
+  .navbtn[aria-selected="true"]{background:var(--brand);color:#fff;font-weight:600}
+  .navbtn:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+  .main{flex:1;padding:20px 24px 60px;min-width:0}
+  .main h2{font-size:18px;margin:0 0 2px}
+  .main .desc{font-size:13px;color:var(--text-2);margin:0 0 4px}
+  .states{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-top:16px}
+
+  /* ---------- 手机框 ---------- */
+  .frame-wrap{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 12px 14px}
+  .frame-wrap .cap{font-size:12px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .tag{font-size:11px;font-weight:500;color:var(--text-2);background:#F0F1F3;border-radius:4px;padding:1px 6px}
+  .note{font-size:11.5px;color:var(--text-3);margin-top:8px;line-height:1.5}
+  .phone{width:300px;height:600px;border:1px solid #D8DADD;border-radius:22px;overflow:hidden;background:var(--bg);
+         display:flex;flex-direction:column;margin:0 auto;position:relative}
+  .statusbar{height:26px;flex:0 0 26px;background:#fff;display:flex;align-items:center;justify-content:space-between;
+             padding:0 12px;font-size:10px;color:var(--text);font-weight:600}
+  .navbar{height:44px;flex:0 0 44px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;
+          justify-content:center;font-size:14px;font-weight:600;position:relative}
+  .navbar .back{position:absolute;left:10px;font-size:16px;color:var(--text-2)}
+  .body{flex:1;overflow:auto;padding:10px}
+  .tabbar{height:52px;flex:0 0 52px;background:#fff;border-top:1px solid var(--border);display:flex}
+  .tabbar div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--text-3);gap:2px}
+  .tabbar div.on{color:var(--brand);font-weight:600}
+
+  /* ---------- 通用组件 ---------- */
+  .card{background:var(--surface);border-radius:var(--radius);padding:12px;margin-bottom:10px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .h3{font-size:14px;font-weight:600;margin:0 0 6px}
+  .p{font-size:12px;color:var(--text-2);margin:2px 0;line-height:1.6}
+  .small{font-size:11px;color:var(--text-3)}
+  .price{color:var(--err);font-weight:700;font-size:16px}
+  .price-s{color:var(--err);font-weight:700;font-size:13px}
+  .strike{text-decoration:line-through;color:var(--text-3);font-size:11px;margin-left:4px}
+  .btn{display:block;width:100%;min-height:44px;border:0;border-radius:8px;background:var(--brand);color:#fff;
+       font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+  .btn.ghost{background:#fff;color:var(--text);border:1px solid var(--border)}
+  .btn:disabled{background:#C8CDD2;color:#fff;cursor:not-allowed}
+  .btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .btn-row{display:flex;gap:8px}
+  .field{margin-bottom:10px}
+  .field label{display:block;font-size:12px;color:var(--text-2);margin-bottom:4px}
+  .field input,.field select,.field textarea{width:100%;min-height:44px;border:1px solid var(--border);border-radius:8px;
+       padding:10px;font:inherit;font-size:13px;background:#fff;color:var(--text)}
+  .field input:focus-visible,.field select:focus-visible{outline:3px solid var(--focus);outline-offset:0;border-color:var(--focus)}
+  .field .err{color:var(--err);font-size:11px;margin-top:4px;display:flex;gap:4px;align-items:flex-start}
+  .field.bad input{border-color:var(--err)}
+  .badge{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;display:inline-block}
+  .b-ok{background:#E6F7EE;color:#06AD56}
+  .b-warn{background:#FFF3E6;color:#C96A00}
+  .b-err{background:#FDECEC;color:#C43C3C}
+  .b-gray{background:#F0F1F3;color:#5C5C5C}
+  .bar{height:6px;background:#EDEFF0;border-radius:3px;overflow:hidden;margin-top:6px}
+  .bar i{display:block;height:100%;background:var(--brand)}
+  .list-item{background:#fff;border-radius:var(--radius);padding:10px;margin-bottom:8px;display:flex;gap:10px}
+  .thumb{width:64px;height:64px;flex:0 0 64px;border-radius:8px;background:#EDEFF0;display:flex;
+         align-items:center;justify-content:center;font-size:10px;color:var(--text-3)}
+  .empty{text-align:center;padding:56px 20px;color:var(--text-3)}
+  .empty .ico{font-size:34px;margin-bottom:8px}
+  .skel{background:linear-gradient(90deg,#EDEFF0 25%,#F6F7F8 37%,#EDEFF0 63%);background-size:400% 100%;
+        animation:sh 1.2s ease infinite;border-radius:6px}
+  @keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+  .center{text-align:center}
+  .mt12{margin-top:12px}.mt16{margin-top:16px}
+  .divider{height:1px;background:var(--border);margin:10px 0}
+  .alert{background:#FDECEC;border:1px solid #F7C9C9;color:#C43C3C;border-radius:8px;padding:10px;font-size:12px;
+         display:flex;gap:6px;align-items:flex-start}
+  .alert.ok{background:#E6F7EE;border-color:#B7E6CB;color:#0A6B3C}
+  .toast{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);background:rgba(0,0,0,.78);color:#fff;
+         padding:10px 14px;border-radius:8px;font-size:12px;z-index:5}
+  .spinner{width:26px;height:26px;border:3px solid #E3E5E7;border-top-color:var(--brand);border-radius:50%;
+           animation:sp .8s linear infinite;margin:14px auto}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .check{width:42px;height:42px;border-radius:50%;background:var(--ok);color:#fff;display:flex;align-items:center;
+         justify-content:center;font-size:22px;margin:12px auto}
+  .kv{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;color:var(--text-2)}
+  .kv b{color:var(--text);font-weight:600}
+  .search{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:8px;
+          padding:6px 10px;min-height:40px;margin-bottom:8px}
+  .search input{flex:1;border:0;outline:0;font:inherit;font-size:13px;min-height:28px;background:transparent}
+  .search .ico{color:var(--text-3);font-size:14px}
+  .search:focus-within{border-color:var(--focus);box-shadow:0 0 0 3px rgba(0,82,217,.18)}
+  .search .clear{font-size:14px;color:var(--text-3);border:0;background:transparent;min-width:28px;min-height:28px;cursor:pointer}
+  .hit{background:#FFF6DA;border-radius:2px;padding:0 1px;font-weight:600}
+  .step{display:flex;gap:8px;align-items:center;font-size:11.5px;color:var(--text-3);margin-bottom:8px}
+  .step .dot{width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;display:flex;
+             align-items:center;justify-content:center;flex:0 0 18px}
+  .step.off .dot{background:#C8CDD2}
+  table.mini{width:100%;border-collapse:collapse;font-size:11px}
+  table.mini th,table.mini td{border-bottom:1px solid var(--border);padding:6px 4px;text-align:left}
+  table.mini th{color:var(--text-3);font-weight:600}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" role="tablist" aria-label="页面导航" aria-orientation="vertical">
+    <h1>SXX-2 Mockup v0.2</h1>
+    <div class="meta">会员店代购小程序<br>移动端 375px 基准 · 全状态<br>PRD: docs/PRD.md</div>
+    <div class="grp">用户端</div>
+    <div id="nav-user"></div>
+    <div class="grp">团长端</div>
+    <div id="nav-leader"></div>
+  </aside>
+  <main class="main">
+    <h2 id="pg-title"></h2>
+    <p class="desc" id="pg-desc"></p>
+    <p class="small" id="pg-fr"></p>
+    <div class="states" id="states"></div>
+  </main>
+</div>
+
+<script>
+/* ============ 页面定义 ============ */
+const TABBAR = u => `<div class="tabbar">
+  <div class="${u===0?'on':''}">团购</div><div class="${u===1?'on':''}">订单</div><div class="${u===2?'on':''}">我的</div></div>`;
+const SB = `<div class="statusbar"><span>9:41</span><span>信号 100%</span></div>`;
+
+const PAGES = [
+/* ---------- P-1 ---------- */
+{id:'P-1',side:'user',title:'P-1 登录 / 角色入口',fr:'FR-1',
+ desc:'微信进入小程序后的身份建立与角色分流。角色是否需审核见【Q-06】。',
+ states:[
+  {n:'默认（未登录）',t:'首屏：展示价值主张与两个入口。',b:`
+    <div class="center" style="padding:40px 18px">
+      <div style="font-size:44px">🛒</div>
+      <div class="h3 mt12" style="font-size:17px">会员店代购</div>
+      <p class="p">山姆 / 盒马 · 社区团购</p>
+      <div class="mt16"><button class="btn">微信一键登录</button></div>
+      <p class="small mt12">登录即同意《用户协议》《隐私政策》</p>
+      <div class="divider"></div>
+      <p class="small">我是团长？ <a href="#" style="color:var(--focus)">申请成为团长</a></p>
+    </div>`},
+  {n:'加载中',t:'登录请求进行中，按钮禁用防重复点击。',b:`
+    <div class="center" style="padding:40px 18px">
+      <div style="font-size:44px">🛒</div>
+      <div class="h3 mt12" style="font-size:17px">会员店代购</div>
+      <div class="mt16"><button class="btn" disabled>登录中…</button></div>
+      <div class="spinner"></div>
+    </div>`},
+  {n:'授权拒绝',t:'用户拒绝授权：给出明确原因与再次授权入口，不静默失败（AC-1.3）。',b:`
+    <div class="center" style="padding:40px 18px">
+      <div style="font-size:44px">🛒</div>
+      <div class="h3 mt12" style="font-size:17px">会员店代购</div>
+      <div class="alert mt16"><span>⚠</span><span>你拒绝了微信授权，无法为你建立账号。浏览团购需要授权身份。</span></div>
+      <div class="mt12"><button class="btn">重新授权</button></div>
+      <div class="mt12"><button class="btn ghost">仅浏览（部分功能不可用）</button></div>
+    </div>`},
+  {n:'网络异常',t:'弱网/超时：可重试，不白屏。',b:`
+    <div class="center" style="padding:40px 18px">
+      <div style="font-size:44px">📶</div>
+      <div class="h3 mt12">网络似乎不太稳定</div>
+      <p class="p">登录超时，请检查网络后重试。</p>
+      <div class="mt16"><button class="btn">重试</button></div>
+    </div>`}
+ ]},
+
+/* ---------- P-2 ---------- */
+{id:'P-2',side:'user',title:'P-2 团购列表（用户）',fr:'FR-6.1 / FR-13',
+ desc:'进行中的团购列表，含搜索框、起团量进度与截团倒计时。进度与剩余时间须与服务端一致（AC-6.1）；搜索态见 FR-13。',
+ states:[
+  {n:'默认（含搜索框）',t:'顶部常驻搜索框 + 列表卡片。搜索与状态筛选为「与」关系（FR-13.4）。',b:`
+   ${SB}<div class="navbar">今日团购</div><div class="body">
+    <div class="search"><span class="ico">🔍</span><input placeholder="搜索商品 / 团长 / 店铺" aria-label="搜索团购">
+      <button class="clear" aria-label="清空搜索">✕</button></div>
+    <div class="row" style="gap:6px;margin-bottom:8px"><span class="badge b-ok">全部</span><span class="badge b-gray">进行中</span><span class="badge b-gray">即将截团</span></div>
+    <div class="list-item">
+      <div class="thumb">图</div>
+      <div style="flex:1;min-width:0">
+        <div class="h3">Member's Mark 冷冻蓝莓 1.36kg</div>
+        <div class="p">山姆 · 1.36kg/袋</div>
+        <div class="row" style="margin-top:4px">
+          <div><span class="price-s">¥89.9</span><span class="strike">¥109</span></div>
+          <span class="small">剩 12:34:05</span>
+        </div>
+        <div class="bar"><i style="width:60%"></i></div>
+        <div class="small">已团 30 / 50 份起团</div>
+      </div>
+    </div>
+    <div class="list-item">
+      <div class="thumb">图</div>
+      <div style="flex:1;min-width:0">
+        <div class="h3">盒马 帝皇鲜 三文鱼刺身 300g</div>
+        <div class="p">盒马 · 300g/盒</div>
+        <div class="row" style="margin-top:4px">
+          <div><span class="price-s">¥68.0</span></div><span class="small">剩 2 天 03:11</span>
+        </div>
+        <div class="bar"><i style="width:100%;background:var(--ok)"></i></div>
+        <div class="small">已达成团量 · 截团后即成团</div>
+      </div>
+    </div>
+    <div class="list-item" style="opacity:.62">
+      <div class="thumb">图</div>
+      <div style="flex:1;min-width:0">
+        <div class="h3">MM 瑞士卷 16 枚 <span class="badge b-gray">已截团</span></div>
+        <div class="p">山姆 · 16 枚/盒</div>
+        <div class="row" style="margin-top:4px"><div><span class="price-s">¥45.0</span></div>
+        <span class="small">已结束</span></div>
+      </div>
+    </div></div>${TABBAR(0)}`},
+  {n:'加载中',t:'骨架屏，避免布局跳动。',b:`
+   ${SB}<div class="navbar">今日团购</div><div class="body">
+    ${[1,2,3].map(()=>`<div class="list-item"><div class="skel thumb"></div><div style="flex:1">
+      <div class="skel" style="height:14px;width:80%"></div>
+      <div class="skel" style="height:10px;width:50%;margin-top:8px"></div>
+      <div class="skel" style="height:6px;margin-top:10px"></div></div></div>`).join('')}
+   </div>${TABBAR(0)}`},
+  {n:'空态',t:'无进行中团购：说明原因 + 引导。',b:`
+   ${SB}<div class="navbar">今日团购</div><div class="body">
+    <div class="empty"><div class="ico">🛍️</div><div class="h3">暂无进行中的团购</div>
+      <p class="p">你附近的团长还没有开团，晚点再来看看。</p>
+      <div class="mt12"><button class="btn ghost" style="width:auto;padding:0 18px">刷新</button></div></div>
+   </div>${TABBAR(0)}`},
+  {n:'错误',t:'拉取失败：可重试，不白屏。',b:`
+   ${SB}<div class="navbar">今日团购</div><div class="body">
+    <div class="alert"><span>⚠</span><span>加载失败（网络异常）。请下拉重试。</span></div>
+    <div class="center mt16"><button class="btn ghost" style="width:auto;padding:0 18px">重新加载</button></div>
+   </div>${TABBAR(0)}`},
+  {n:'输入中（防抖）',t:'已输入「蓝」但未达最小触发长度：不发请求、列表不闪空，仅顶部给出轻量提示（AC-13.5）。',b:`
+   ${SB}<div class="navbar">今日团购</div><div class="body">
+    <div class="search"><span class="ico">🔍</span><input value="蓝" aria-label="搜索团购" style="font-weight:600">
+      <button class="clear" aria-label="清空搜索">✕</button></div>
+    <p class="small" style="margin:0 0 8px">再输入 1 个字开始搜索（最小触发长度待确认 Q-38）</p>
+    <div class="list-item"><div class="thumb">图</div><div style="flex:1;min-width:0">
+      <div class="h3">Member's Mark 冷冻蓝莓 1.36kg</div>
+      <p class="p">山姆 · 1.36kg/袋</p>
+      <div class="row" style="margin-top:4px"><div><span class="price-s">¥89.9</span></div><span class="small">剩 12:34:05</span></div></div></div>
+    <div class="list-item"><div class="thumb">图</div><div style="flex:1;min-width:0">
+      <div class="h3">盒马 帝皇鲜 三文鱼刺身 300g</div>
+      <p class="p">盒马 · 300g/盒</p>
+      <div class="row" style="margin-top:4px"><div><span class="price-s">¥68.0</span></div><span class="small">剩 2 天 03:11</span></div></div></div>
+   </div>${TABBAR(0)}`},
+  {n:'搜索中（已触发）',t:'关键词「蓝莓」已达触发长度：防抖 300ms 后发起请求，搜索框内显示载入指示，列表保持上一次结果避免跳动。',b:`
+   ${SB}<div class="navbar">今日团购</div><div class="body">
+    <div class="search"><span class="ico">🔍</span><input value="蓝莓" aria-label="搜索团购" style="font-weight:600">
+      <span style="width:16px;height:16px;border:2px solid #D8DADD;border-top-color:var(--brand);border-radius:50%;
+            display:inline-block;animation:sp .8s linear infinite"></span>
+      <button class="clear" aria-label="清空搜索">✕</button></div>
+    <p class="small" style="margin:0 0 8px">搜索中…（连续输入只发一次请求，防抖待确认 Q-37）</p>
+    <div class="list-item" style="opacity:.55"><div class="thumb">图</div><div style="flex:1;min-width:0">
+      <div class="h3">Member's Mark 冷冻蓝莓 1.36kg</div><p class="p">上一次结果保留中</p></div></div>
+   </div>${TABBAR(0)}`},
+  {n:'搜索有结果',t:'命中项高亮关键词；顶部回显「找到 N 个结果」；筛选与关键词并存（AC-13.8）。',b:`
+   ${SB}<div class="navbar">今日团购</div><div class="body">
+    <div class="search"><span class="ico">🔍</span><input value="蓝莓" aria-label="搜索团购" style="font-weight:600">
+      <button class="clear" aria-label="清空搜索">✕</button></div>
+    <div class="row" style="margin-bottom:8px"><span class="small">找到 3 个结果 · 关键词「蓝莓」</span>
+      <span class="badge b-gray">筛选：进行中</span></div>
+    <div class="list-item"><div class="thumb">图</div><div style="flex:1;min-width:0">
+      <div class="h3">Member's Mark 冷冻<span class="hit">蓝莓</span> 1.36kg</div>
+      <p class="p">山姆 · 1.36kg/袋</p>
+      <div class="row" style="margin-top:4px"><div><span class="price-s">¥89.9</span></div><span class="small">剩 12:34:05</span></div></div></div>
+    <div class="list-item"><div class="thumb">图</div><div style="flex:1;min-width:0">
+      <div class="h3">MM <span class="hit">蓝莓</span>干 200g</div>
+      <p class="p">山姆 · 200g/袋</p>
+      <div class="row" style="margin-top:4px"><div><span class="price-s">¥42.0</span></div><span class="small">剩 1 天 08:20</span></div></div></div>
+    <div class="list-item"><div class="thumb">图</div><div style="flex:1;min-width:0">
+      <div class="h3">盒马 有机<span class="hit">蓝莓</span> 125g×4</div>
+      <p class="p">盒马 · 500g</p>
+      <div class="row" style="margin-top:4px"><div><span class="price-s">¥39.9</span></div><span class="small">剩 3 天 12:00</span></div></div></div>
+    <div class="center small" style="padding:6px">已显示全部 3 个结果</div>
+   </div>${TABBAR(0)}`},
+  {n:'无匹配',t:'搜索无结果：与「列表本身为空」区分开，回显关键词 + 给「清空关键词」和放宽建议（AC-13.7）。',b:`
+   ${SB}<div class="navbar">今日团购</div><div class="body">
+    <div class="search"><span class="ico">🔍</span><input value="车厘子" aria-label="搜索团购" style="font-weight:600">
+      <button class="clear" aria-label="清空搜索">✕</button></div>
+    <div class="empty"><div class="ico">🔍</div><div class="h3">没有找到「车厘子」相关的团购</div>
+      <p class="p">换个关键词，或清空条件看看全部团购。</p>
+      <div class="mt12"><button class="btn" style="width:auto;padding:0 18px">清空关键词</button></div>
+      <div class="mt12"><button class="btn ghost" style="width:auto;padding:0 18px">清除筛选条件</button></div></div>
+    <p class="small center">⚠ 此态 ≠ 空态「暂无进行中的团购」（见 P-2 空态）</p>
+   </div>${TABBAR(0)}`}
+ ]},
+
+/* ---------- P-3 ---------- */
+{id:'P-3',side:'user',title:'P-3 团购详情（用户）',fr:'FR-6.2',
+ desc:'商品详情 + 团购参数 + 履约方式。履约方式待确认【Q-17】。',
+ states:[
+  {n:'默认（可参团）',t:'展示起团量/截团时间/履约方式；主 CTA 固定可见。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>团购详情</div><div class="body">
+    <div class="thumb" style="width:100%;height:180px;border-radius:10px">商品图</div>
+    <div class="card" style="margin-top:10px">
+      <div class="h3">Member's Mark 冷冻蓝莓 1.36kg</div>
+      <div><span class="price">¥89.9</span><span class="strike">¥109</span></div>
+      <p class="p">山姆会员店 · 1.36kg/袋 · 团长代购</p>
+      <div class="divider"></div>
+      <div class="kv"><span>起团量</span><b>50 份</b></div>
+      <div class="kv"><span>已参团</span><b>30 份</b></div>
+      <div class="kv"><span>截团时间</span><b>10-15 21:00</b></div>
+      <div class="kv"><span>履约方式</span><b>团长配送 / 自提点自提</b></div>
+      <div class="kv"><span>预计送达</span><b>截团后 2 日内</b></div>
+    </div>
+    <div class="card"><div class="h3">商品说明</div><p class="p">产地、规格、保存方式等由团长填写。平台不参与采购，价格与库存由团长维护。</p></div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <button class="btn">参团 · 选择数量</button></div>`},
+  {n:'已截团',t:'CTA 禁用并说明原因；不可下单（AC-6.3）。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>团购详情</div><div class="body">
+    <div class="thumb" style="width:100%;height:140px;border-radius:10px">商品图</div>
+    <div class="card" style="margin-top:10px">
+      <div class="row"><div class="h3">MM 瑞士卷 16 枚</div><span class="badge b-gray">已截团</span></div>
+      <div><span class="price">¥45.0</span></div>
+      <div class="divider"></div>
+      <div class="kv"><span>最终结果</span><b style="color:var(--ok)">已成团（62/50）</b></div>
+      <div class="kv"><span>截团时间</span><b>10-14 21:00</b></div>
+    </div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <button class="btn" disabled>已截团，不可参团</button></div>`},
+  {n:'已达起团量',t:'明确告知「已达标，截团即成」，避免用户误以为可继续等。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>团购详情</div><div class="body">
+    <div class="card"><div class="row"><div class="h3">盒马 帝皇鲜 三文鱼刺身</div><span class="badge b-ok">已达起团量</span></div>
+      <div><span class="price">¥68.0</span></div>
+      <div class="bar"><i style="width:100%;background:var(--ok)"></i></div>
+      <div class="small">已团 40 / 40 份 · 截团后自动成团</div>
+      <div class="divider"></div>
+      <div class="kv"><span>截团时间</span><b>10-16 18:00</b></div>
+    </div>
+    <div class="alert ok"><span>✓</span><span>已达起团量，仍可在截团前继续参团。</span></div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <button class="btn">参团 · 选择数量</button></div>`},
+  {n:'售罄 / 超库存',t:'库存耗尽：禁用 CTA 并说明，不做「假可买」。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>团购详情</div><div class="body">
+    <div class="card"><div class="row"><div class="h3">MM 烤鸡 1.2kg</div><span class="badge b-warn">已售罄</span></div>
+      <div><span class="price">¥39.8</span></div>
+      <div class="bar"><i style="width:100%;background:var(--warn)"></i></div>
+      <div class="small">已团 100 / 100 份（团长设置限量）</div>
+    </div>
+    <div class="alert"><span>⚠</span><span>本团已达团长设置的限量，无法继续参团。</span></div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <button class="btn" disabled>已售罄</button></div>`}
+ ]},
+
+/* ---------- P-4 ---------- */
+{id:'P-4',side:'user',title:'P-4 参团下单（用户）',fr:'FR-6.3 / FR-7 / FR-9',
+ desc:'数量 + 履约信息 + 支付。是否在线支付待确认【Q-19】，运费规则待确认【Q-22】。',
+ states:[
+  {n:'默认',t:'数量步进、金额实时计算、配送/自提切换。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>确认参团</div><div class="body">
+    <div class="card"><div class="row"><div><div class="h3">MM 冷冻蓝莓 1.36kg</div><p class="small">山姆 · 团长：王团长</p></div><span class="price-s">¥89.9</span></div></div>
+    <div class="card"><div class="h3">数量</div>
+      <div class="row"><button class="btn ghost" style="width:44px;min-height:44px">−</button>
+      <b style="font-size:16px">2</b><button class="btn ghost" style="width:44px;min-height:44px">＋</button></div>
+      <p class="small">每人限购 5 份</p></div>
+    <div class="card"><div class="h3">履约方式</div>
+      <div class="row" style="padding:8px 0"><label style="display:flex;gap:8px;align-items:center;font-size:13px"><input type="radio" name="d" checked style="width:20px;min-height:20px">团长配送</label></div>
+      <div class="row" style="padding:8px 0"><label style="display:flex;gap:8px;align-items:center;font-size:13px"><input type="radio" name="d" style="width:20px;min-height:20px">自提点自提</label></div>
+    </div>
+    <div class="card">
+      <div class="field"><label>收货人</label><input value="张小明"></div>
+      <div class="field"><label>手机号</label><input value="138****8888"></div>
+      <div class="field"><label>收货地址</label><input placeholder="请选择小区 / 楼栋门牌"></div>
+    </div>
+    <div class="card"><div class="kv"><span>商品金额</span><b>¥179.80</b></div>
+      <div class="kv"><span>配送费</span><b>¥0.00（满 ¥150 免运）</b></div>
+      <div class="kv"><span>合计</span><b class="price-s">¥179.80</b></div></div>
+    <div class="alert"><span>⚠</span><span>未成团将自动全额退款（口径待确认 Q-20）。</span></div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <button class="btn">支付 ¥179.80</button></div>`},
+  {n:'校验错误',t:'必填缺失/格式非法：行内报错 + 聚焦首错，不靠颜色单独传达。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>确认参团</div><div class="body">
+    <div class="alert"><span>⚠</span><span>有 3 项需要修改后才能提交。</span></div>
+    <div class="card">
+      <div class="field bad"><label>收货人</label><input placeholder="请输入收货人姓名"><div class="err"><span>✕</span><span>收货人不能为空</span></div></div>
+      <div class="field bad"><label>手机号</label><input value="1380013"><div class="err"><span>✕</span><span>手机号格式不正确（11 位）</span></div></div>
+      <div class="field bad"><label>收货地址</label><input placeholder="请选择小区 / 楼栋门牌"><div class="err"><span>✕</span><span>选择配送后必须填写收货地址</span></div></div>
+    </div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <button class="btn" disabled>请先完善信息</button></div>`},
+  {n:'超量',t:'超过限购/剩余库存：即时提示并说明上限。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>确认参团</div><div class="body">
+    <div class="card"><div class="h3">数量</div>
+      <div class="row"><button class="btn ghost" style="width:44px;min-height:44px">−</button>
+      <b style="font-size:16px">6</b><button class="btn ghost" style="width:44px;min-height:44px" disabled>＋</button></div>
+      <div class="err" style="color:var(--err);font-size:11px;margin-top:6px"><span>✕</span><span>每人限购 5 份，已超出 1 份</span></div></div>
+    <div class="alert"><span>⚠</span><span>本团剩余可购 12 份，且每人限购 5 份。</span></div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <button class="btn" disabled>数量超上限</button></div>`},
+  {n:'提交中',t:'防重复提交：按钮禁用 + 加载指示。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>确认参团</div><div class="body">
+    <div class="center" style="padding:60px 16px"><div class="spinner"></div><div class="h3">正在创建订单…</div><p class="p">请勿退出</p></div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <button class="btn" disabled>处理中…</button></div>`},
+  {n:'成功',t:'下单成功：明确支付状态 + 成团待定说明。',b:`
+   ${SB}<div class="navbar">参团成功</div><div class="body">
+    <div class="center"><div class="check">✓</div><div class="h3">参团成功</div><p class="p">订单号 20261014-000123</p></div>
+    <div class="card"><div class="kv"><span>支付状态</span><b style="color:var(--ok)">已支付 ¥179.80</b></div>
+      <div class="kv"><span>团购状态</span><b>进行中（等待截团）</b></div>
+      <div class="kv"><span>截团时间</span><b>10-15 21:00</b></div></div>
+    <div class="card"><div class="step"><span class="dot">1</span><span>已下单</span></div>
+      <div class="step"><span class="dot">2</span><span>截团判定（达量即成团）</span></div>
+      <div class="step off"><span class="dot">3</span><span>配货 / 配送</span></div>
+      <div class="step off"><span class="dot">4</span><span>送达 / 自提</span></div></div>
+    <div class="btn-row"><button class="btn ghost">查看订单</button><button class="btn">回到团购</button></div>
+   </div>${TABBAR(1)}`},
+  {n:'失败（支付失败）',t:'支付失败：不产生有效订单，可重试；幂等（AC-7.3）。',b:`
+   ${SB}<div class="navbar">参团失败</div><div class="body">
+    <div class="center"><div style="font-size:42px">✕</div><div class="h3">支付未完成</div>
+      <p class="p">本次未产生有效订单，可重新支付。</p></div>
+    <div class="alert"><span>⚠</span><span>失败原因：用户取消支付。</span></div>
+    <div class="mt12"><button class="btn">重新支付</button></div>
+    <div class="mt12"><button class="btn ghost">返回详情</button></div>
+   </div>${TABBAR(1)}`}
+ ]},
+
+/* ---------- P-5 ---------- */
+{id:'P-5',side:'user',title:'P-5 我的订单 / 详情（用户）',fr:'FR-6.4 / FR-8',
+ desc:'订单列表与状态流转；未成团退款可见（AC-8.1）。状态集待确认【Q-15/Q-24】。',
+ states:[
+  {n:'列表（默认）',t:'按状态分组；状态用「文案+颜色」双重编码。',b:`
+   ${SB}<div class="navbar">我的订单</div><div class="body">
+    <div class="row" style="margin-bottom:8px"><span class="badge b-ok">全部</span><span class="badge b-gray">待成团</span><span class="badge b-gray">配送中</span><span class="badge b-gray">已退款</span></div>
+    <div class="card"><div class="row"><span class="small">20261014-000123</span><span class="badge b-warn">待成团</span></div>
+      <div class="row" style="margin-top:8px"><div class="thumb" style="width:48px;height:48px;flex:0 0 48px">图</div>
+      <div style="flex:1"><div class="h3" style="font-size:13px">MM 冷冻蓝莓 1.36kg ×2</div><p class="small">王团长 · 截团 10-15 21:00</p></div>
+      <b>¥179.80</b></div></div>
+    <div class="card"><div class="row"><span class="small">20261012-000098</span><span class="badge b-ok">配送中</span></div>
+      <div class="row" style="margin-top:8px"><div class="thumb" style="width:48px;height:48px;flex:0 0 48px">图</div>
+      <div style="flex:1"><div class="h3" style="font-size:13px">盒马 三文鱼刺身 ×1</div><p class="small">已成团 · 团长配送</p></div>
+      <b>¥68.00</b></div></div>
+    <div class="card"><div class="row"><span class="small">20261010-000055</span><span class="badge b-err">已退款</span></div>
+      <div class="row" style="margin-top:8px"><div class="thumb" style="width:48px;height:48px;flex:0 0 48px">图</div>
+      <div style="flex:1"><div class="h3" style="font-size:13px">MM 瑞士卷 ×1</div><p class="small">未成团 · 已全额退款</p></div>
+      <b>¥45.00</b></div></div>
+   </div>${TABBAR(1)}`},
+  {n:'列表（空）',t:'新用户空态 + 引导去逛团购。',b:`
+   ${SB}<div class="navbar">我的订单</div><div class="body">
+    <div class="empty"><div class="ico">🧾</div><div class="h3">还没有订单</div><p class="p">去挑一个正在拼的团吧。</p>
+    <div class="mt12"><button class="btn ghost" style="width:auto;padding:0 18px">去逛团购</button></div></div>
+   </div>${TABBAR(1)}`},
+  {n:'详情 · 待成团',t:'明确「钱已付、未成团会自动退」。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>订单详情</div><div class="body">
+    <div class="card"><div class="row"><div class="h3">待成团</div><span class="badge b-warn">等待截团判定</span></div>
+      <p class="p">已达 30/50 份，截团时间 10-15 21:00。未成团将自动全额退款。</p></div>
+    <div class="card"><div class="kv"><span>订单号</span><b>20261014-000123</b></div>
+      <div class="kv"><span>商品</span><b>MM 冷冻蓝莓 ×2</b></div>
+      <div class="kv"><span>实付</span><b class="price-s">¥179.80</b></div>
+      <div class="kv"><span>履约方式</span><b>团长配送</b></div></div>
+    <div class="btn-row"><button class="btn ghost">联系团长</button><button class="btn ghost">取消订单</button></div>
+   </div>`},
+  {n:'详情 · 退款中/已退款',t:'退款进度对用户可见，失败不能静默（AC-8.3）。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>订单详情</div><div class="body">
+    <div class="card"><div class="row"><div class="h3">未成团</div><span class="badge b-err">已退款</span></div>
+      <p class="p">本团仅达成 32/50 份，未成团，已发起全额退款。</p></div>
+    <div class="card"><div class="step"><span class="dot">✓</span><span>退款申请 10-14 21:05</span></div>
+      <div class="step"><span class="dot">✓</span><span>微信受理 10-14 21:05</span></div>
+      <div class="step"><span class="dot">✓</span><span>到账 ¥45.00 10-14 21:06</span></div></div>
+    <div class="alert ok"><span>✓</span><span>退款已原路返回，1–3 个工作日到账。</span></div>
+   </div>`}
+ ]},
+
+/* ---------- P-6 ---------- */
+{id:'P-6',side:'leader',title:'P-6 团长入驻申请',fr:'FR-2',
+ desc:'是否需平台审核待确认【Q-06】；申请字段集待确认【Q-05】。',
+ states:[
+  {n:'默认',t:'表单采集入驻信息。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>申请成为团长</div><div class="body">
+    <div class="card">
+      <div class="field"><label>姓名 *</label><input placeholder="请输入真实姓名"></div>
+      <div class="field"><label>手机号 *</label><input placeholder="11 位手机号"></div>
+      <div class="field"><label>常驻社区 *</label><input placeholder="如：XX 花园 / XX 街道"></div>
+      <div class="field"><label>主要采购门店</label><select><option>山姆会员店</option><option>盒马</option><option>其他</option></select></div>
+      <div class="field"><label>补充说明</label><textarea placeholder="如：每周可采购次数、配送范围"></textarea></div>
+    </div>
+    <p class="small">提交后由平台审核（审核流程待确认 Q-06）。</p>
+    <div class="mt12"><button class="btn">提交申请</button></div></div>`},
+  {n:'校验错误',t:'行内报错 + 首错聚焦。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>申请成为团长</div><div class="body">
+    <div class="alert"><span>⚠</span><span>有 2 项需要修改。</span></div>
+    <div class="card">
+      <div class="field bad"><label>姓名 *</label><input placeholder="请输入真实姓名"><div class="err"><span>✕</span><span>姓名不能为空</span></div></div>
+      <div class="field bad"><label>手机号 *</label><input value="1380013"><div class="err"><span>✕</span><span>手机号格式不正确</span></div></div>
+      <div class="field"><label>常驻社区 *</label><input value="XX 花园"></div>
+    </div>
+    <div class="mt12"><button class="btn" disabled>请先完善信息</button></div></div>`},
+  {n:'待审核',t:'提交后状态可见，团长功能入口锁定。',b:`
+   ${SB}<div class="navbar">团长入驻</div><div class="body">
+    <div class="center"><div style="font-size:42px">⏳</div><div class="h3">审核中</div>
+      <p class="p">提交时间 2026-10-14 09:41，预计 1 个工作日内完成。</p></div>
+    <div class="card"><div class="kv"><span>姓名</span><b>王小明</b></div>
+      <div class="kv"><span>常驻社区</span><b>XX 花园</b></div>
+      <div class="kv"><span>状态</span><b style="color:var(--warn)">待审核</b></div></div>
+    <div class="alert"><span>⚠</span><span>审核通过前无法使用商品维护与开团功能。</span></div>
+   </div>`},
+  {n:'审核通过',t:'权限即时生效（是否需重登待确认 AC-2.2）。',b:`
+   ${SB}<div class="navbar">团长入驻</div><div class="body">
+    <div class="center"><div class="check">✓</div><div class="h3">审核通过</div><p class="p">你现在可以维护商品并发起团购了。</p></div>
+    <div class="mt12"><button class="btn">进入团长工作台</button></div></div>`},
+  {n:'审核不通过',t:'必须给出原因 + 可修改重提（AC-2.3）。',b:`
+   ${SB}<div class="navbar">团长入驻</div><div class="body">
+    <div class="center"><div style="font-size:42px">✕</div><div class="h3">审核未通过</div></div>
+    <div class="alert"><span>⚠</span><span>不通过原因：常驻社区信息不完整，请补充到门牌/楼栋级别。</span></div>
+    <div class="mt12"><button class="btn">修改并重新提交</button></div>
+    <div class="mt12"><button class="btn ghost">返回</button></div></div>`}
+ ]},
+
+/* ---------- P-7 ---------- */
+{id:'P-7',side:'leader',title:'P-7 商品列表（团长）',fr:'FR-3.3',
+ desc:'团长商品目录，支持筛选与上下架。字段集待确认【Q-08】。',
+ states:[
+  {n:'默认',t:'列表 + 筛选 + 上下架开关。',b:`
+   ${SB}<div class="navbar">商品管理</div><div class="body">
+    <div class="row" style="gap:6px;margin-bottom:8px">
+      <select style="min-height:38px;font-size:12px"><option>全部状态</option><option>在售</option><option>已下架</option></select>
+      <select style="min-height:38px;font-size:12px"><option>全部门店</option><option>山姆</option><option>盒马</option></select></div>
+    <div class="list-item"><div class="thumb">图</div><div style="flex:1;min-width:0">
+      <div class="row"><div class="h3" style="font-size:13px">MM 冷冻蓝莓 1.36kg</div><span class="badge b-ok">在售</span></div>
+      <p class="small">山姆 · ¥89.9 · 库存 100</p>
+      <div class="row" style="margin-top:6px"><span class="small">编辑 / 下架</span><span class="small">删除</span></div></div></div>
+    <div class="list-item"><div class="thumb">图</div><div style="flex:1;min-width:0">
+      <div class="row"><div class="h3" style="font-size:13px">盒马 三文鱼刺身 300g</div><span class="badge b-ok">在售</span></div>
+      <p class="small">盒马 · ¥68.0 · 库存 40</p>
+      <div class="row" style="margin-top:6px"><span class="small">编辑 / 下架</span><span class="small">删除</span></div></div></div>
+    <div class="list-item" style="opacity:.66"><div class="thumb">图</div><div style="flex:1;min-width:0">
+      <div class="row"><div class="h3" style="font-size:13px">MM 烤鸡 1.2kg</div><span class="badge b-gray">已下架</span></div>
+      <p class="small">山姆 · ¥39.8 · 库存 0</p>
+      <div class="row" style="margin-top:6px"><span class="small">编辑 / 上架</span><span class="small">删除</span></div></div></div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <div class="btn-row"><button class="btn ghost">批量上传</button><button class="btn">新增商品</button></div></div>`},
+  {n:'空态',t:'引导两条路径：手工新增 / 批量上传。',b:`
+   ${SB}<div class="navbar">商品管理</div><div class="body">
+    <div class="empty"><div class="ico">📦</div><div class="h3">还没有商品</div>
+      <p class="p">你可以逐个新增，或下载模板批量上传。</p>
+      <div class="mt12"><button class="btn" style="width:auto;padding:0 18px">下载模板批量上传</button></div>
+      <div class="mt12"><button class="btn ghost" style="width:auto;padding:0 18px">新增单个商品</button></div></div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <button class="btn">新增商品</button></div>`},
+  {n:'筛选无结果',t:'明确「无匹配」而非「无数据」，可清空筛选。',b:`
+   ${SB}<div class="navbar">商品管理</div><div class="body">
+    <div class="alert"><span>⚠</span><span>当前筛选：状态=在售，门店=盒马。</span></div>
+    <div class="empty"><div class="ico">🔍</div><div class="h3">没有符合条件的商品</div><p class="p">试试调整筛选条件。</p>
+    <div class="mt12"><button class="btn ghost" style="width:auto;padding:0 18px">清空筛选</button></div></div></div>`},
+  {n:'加载中',t:'骨架屏。',b:`
+   ${SB}<div class="navbar">商品管理</div><div class="body">
+    ${[1,2,3,4].map(()=>`<div class="list-item"><div class="skel thumb"></div><div style="flex:1">
+      <div class="skel" style="height:13px;width:70%"></div><div class="skel" style="height:10px;width:45%;margin-top:8px"></div></div></div>`).join('')}</div>`}
+ ]},
+
+/* ---------- P-8 ---------- */
+{id:'P-8',side:'leader',title:'P-8 商品编辑 / 新增（团长）',fr:'FR-3.1 / FR-3.2',
+ desc:'字段集与是否必填待确认【Q-08】；价格快照行为待确认【Q-30】。',
+ states:[
+  {n:'默认（新增）',t:'必填标记 + 单位/来源门店下拉。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>新增商品</div><div class="body">
+    <div class="card">
+      <div class="field"><label>商品名称 *</label><input placeholder="如：MM 冷冻蓝莓 1.36kg"></div>
+      <div class="field"><label>来源门店 *</label><select><option>山姆会员店</option><option>盒马</option><option>其他</option></select></div>
+      <div class="field"><label>规格 *</label><input placeholder="如：1.36kg/袋"></div>
+      <div class="field"><label>售价（元）*</label><input placeholder="0.00"></div>
+      <div class="field"><label>可售库存 *</label><input placeholder="0"></div>
+      <div class="field"><label>商品图片</label><div class="thumb" style="width:72px;height:72px">＋ 上传</div></div>
+      <div class="field"><label>商品说明</label><textarea placeholder="产地、保存方式等"></textarea></div>
+    </div>
+    <div class="btn-row"><button class="btn ghost">取消</button><button class="btn">保存并上架</button></div></div>`},
+  {n:'校验错误',t:'数值型字段校验：负数/非数字/超长文本。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>新增商品</div><div class="body">
+    <div class="alert"><span>⚠</span><span>有 3 项需要修改。</span></div>
+    <div class="card">
+      <div class="field bad"><label>商品名称 *</label><input><div class="err"><span>✕</span><span>商品名称不能为空</span></div></div>
+      <div class="field bad"><label>售价（元）*</label><input value="-5"><div class="err"><span>✕</span><span>售价必须大于 0</span></div></div>
+      <div class="field bad"><label>可售库存 *</label><input value="abc"><div class="err"><span>✕</span><span>库存必须为整数</span></div></div>
+    </div>
+    <div class="btn-row"><button class="btn ghost">取消</button><button class="btn" disabled>请先完善信息</button></div></div>`},
+  {n:'保存中 / 成功',t:'禁用防重复；成功给出明确反馈。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>编辑商品</div><div class="body">
+    <div class="center" style="padding:60px 16px"><div class="check">✓</div><div class="h3">保存成功</div>
+      <p class="p">商品已上架，可在团购中选用。</p></div>
+    <div class="alert ok"><span>✓</span><span>价格修改不会影响已开团的历史价格（Q-30 待确认）。</span></div>
+    <div class="mt12"><button class="btn">返回商品列表</button></div></div>`}
+ ]},
+
+/* ---------- P-9 ---------- */
+{id:'P-9',side:'leader',title:'P-9 批量上传（团长）',fr:'FR-4',
+ desc:'模板字段【Q-08】、文件格式【Q-09】、导入语义【Q-10】、上限【Q-11】均待确认。',
+ states:[
+  {n:'步骤 1：下载模板',t:'先给模板与字段说明，降低失败率。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>批量上传商品</div><div class="body">
+    <div class="card"><div class="h3">第一步：下载模板</div>
+      <p class="p">按模板填写后上传，可一次导入多个商品。</p>
+      <div class="mt12"><button class="btn ghost">下载模板（.xlsx）</button></div></div>
+    <div class="card"><div class="h3">模板字段说明</div>
+      <table class="mini"><tr><th>字段</th><th>必填</th><th>说明</th></tr>
+      <tr><td>商品名称</td><td>是</td><td>≤60 字</td></tr>
+      <tr><td>来源门店</td><td>是</td><td>山姆/盒马/其他</td></tr>
+      <tr><td>规格</td><td>是</td><td>文本</td></tr>
+      <tr><td>售价</td><td>是</td><td>数字 &gt; 0</td></tr>
+      <tr><td>库存</td><td>是</td><td>整数 ≥ 0</td></tr>
+      <tr><td>图片 URL</td><td>否</td><td>http(s)</td></tr></table>
+      <p class="small" style="margin-top:6px">⚠ 字段集【待确认 Q-08】</p></div>
+    <div class="mt12"><button class="btn">下一步：选择文件</button></div></div>`},
+  {n:'步骤 2：选择文件',t:'格式/大小上限提示前置。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>批量上传商品</div><div class="body">
+    <div class="card"><div class="h3">第二步：选择填写好的文件</div>
+      <div style="border:1px dashed var(--border);border-radius:10px;padding:28px 12px;text-align:center;margin-top:10px">
+        <div style="font-size:30px">📄</div><div class="p">点击选择 .xlsx 文件</div>
+        <p class="small">单文件 ≤ 5MB，单次 ≤ 1000 条（待确认 Q-11）</p></div>
+      <p class="small" style="margin-top:8px">已选：products_20261014.xlsx（128 KB）</p></div>
+    <div class="mt12"><button class="btn">开始上传</button></div></div>`},
+  {n:'上传中',t:'进度可见，禁用返回造成的状态不明（可取消）。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>批量上传商品</div><div class="body">
+    <div class="card center"><div class="spinner"></div><div class="h3">上传并校验中…</div>
+      <div class="bar" style="margin-top:10px"><i style="width:62%"></i></div><p class="small">62% · 已处理 124/200 行</p></div>
+    <div class="mt12"><button class="btn ghost">取消上传</button></div></div>`},
+  {n:'全部成功',t:'给出条数与结果入口。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>批量上传商品</div><div class="body">
+    <div class="center"><div class="check">✓</div><div class="h3">导入完成</div></div>
+    <div class="card"><div class="kv"><span>总行数</span><b>200</b></div>
+      <div class="kv"><span>成功</span><b style="color:var(--ok)">200</b></div>
+      <div class="kv"><span>失败</span><b>0</b></div></div>
+    <div class="alert ok"><span>✓</span><span>全部商品已导入，默认状态为「在售」。</span></div>
+    <div class="mt12"><button class="btn">查看商品列表</button></div></div>`},
+  {n:'部分失败（含明细）',t:'核心场景：逐行反馈 + 可下载失败明细（AC-4.3）。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>批量上传商品</div><div class="body">
+    <div class="card"><div class="kv"><span>总行数</span><b>200</b></div>
+      <div class="kv"><span>成功</span><b style="color:var(--ok)">194</b></div>
+      <div class="kv"><span>失败</span><b style="color:var(--err)">6</b></div></div>
+    <div class="alert"><span>⚠</span><span>失败行未导入，修正后可重新上传。</span></div>
+    <div class="card"><div class="h3">失败明细</div>
+      <table class="mini"><tr><th>行号</th><th>字段</th><th>原因</th></tr>
+      <tr><td>12</td><td>售价</td><td>不能为空</td></tr>
+      <tr><td>37</td><td>库存</td><td>「abc」不是整数</td></tr>
+      <tr><td>58</td><td>来源门店</td><td>不在枚举内：costco</td></tr>
+      <tr><td>101</td><td>商品名称</td><td>超过 60 字</td></tr>
+      <tr><td>102</td><td>商品名称</td><td>与第 101 行重复</td></tr>
+      <tr><td>180</td><td>图片 URL</td><td>不是合法 http(s) 链接</td></tr></table>
+      <div class="mt12"><button class="btn ghost">下载失败明细（.xlsx）</button></div></div>
+    <div class="btn-row"><button class="btn ghost">重新上传</button><button class="btn">仅导入成功的 194 条</button></div></div>`},
+  {n:'全部失败 / 文件非法',t:'拒绝且不留脏数据；空文件、错误格式、超限分别提示。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>批量上传商品</div><div class="body">
+    <div class="center"><div style="font-size:42px">✕</div><div class="h3">导入失败</div></div>
+    <div class="alert"><span>⚠</span><span>文件格式不支持：仅接受 .xlsx。你上传的是 products.csv。</span></div>
+    <div class="card"><div class="h3">常见失败原因</div>
+      <p class="p">· 文件为空或仅有表头</p>
+      <p class="p">· 格式非 .xlsx（待确认是否支持 csv，Q-09）</p>
+      <p class="p">· 超过 5MB 或 1000 条上限</p>
+      <p class="p">· 表头与模板不一致</p></div>
+    <div class="mt12"><button class="btn ghost">重新下载模板</button></div>
+    <div class="mt12"><button class="btn">重新选择文件</button></div></div>`}
+ ]},
+
+/* ---------- P-10 ---------- */
+{id:'P-10',side:'leader',title:'P-10 团购管理（团长）',fr:'FR-5',
+ desc:'开团参数（起团量【Q-12】、截团时间【Q-14】）与判定规则【Q-13】均待确认。',
+ states:[
+  {n:'默认（列表）',t:'按状态分组；突出「待处理」动作。',b:`
+   ${SB}<div class="navbar">团购管理</div><div class="body">
+    <div class="row" style="gap:6px;margin-bottom:8px"><span class="badge b-ok">全部</span><span class="badge b-gray">进行中</span><span class="badge b-gray">待判定</span><span class="badge b-gray">已结束</span></div>
+    <div class="card"><div class="row"><div class="h3" style="font-size:13px">MM 冷冻蓝莓 1.36kg</div><span class="badge b-ok">进行中</span></div>
+      <p class="small">30/50 份 · 截团 10-15 21:00</p>
+      <div class="bar"><i style="width:60%"></i></div>
+      <div class="row" style="margin-top:8px"><span class="small">查看名单</span><span class="small">提前截团</span><span class="small">取消团购</span></div></div>
+    <div class="card" style="border:1px solid var(--warn)"><div class="row"><div class="h3" style="font-size:13px">盒马 三文鱼刺身</div><span class="badge b-warn">待判定</span></div>
+      <p class="small">40/40 份 · 已于 10-14 18:00 截团</p>
+      <div class="row" style="margin-top:8px"><span class="small">查看名单</span><b style="font-size:12px;color:var(--warn)">执行成团判定</b></div></div>
+    <div class="card"><div class="row"><div class="h3" style="font-size:13px">MM 瑞士卷 16 枚</div><span class="badge b-ok">已成团</span></div>
+      <p class="small">62/50 份 · 待配货 62 份</p>
+      <div class="row" style="margin-top:8px"><span class="small">查看名单</span><span class="small">更新履约状态</span></div></div>
+   </div>
+   <div style="flex:0 0 auto;background:#fff;border-top:1px solid var(--border);padding:8px 10px">
+     <button class="btn">发起新团购</button></div>`},
+  {n:'发起团购（表单）',t:'起团量/截团时间/团购价/履约方式。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>发起团购</div><div class="body">
+    <div class="card"><div class="row"><div><div class="h3" style="font-size:13px">MM 冷冻蓝莓 1.36kg</div><p class="small">山姆 · 库存 100</p></div><span class="price-s">¥89.9</span></div></div>
+    <div class="card">
+      <div class="field"><label>团购价（元）*</label><input value="89.9"></div>
+      <div class="field"><label>起团量（份）*</label><input value="50"><p class="small">达到该数量才成团（Q-12 待确认）</p></div>
+      <div class="field"><label>本团限量（份）</label><input value="100"></div>
+      <div class="field"><label>截团时间 *</label><input value="2026-10-15 21:00"></div>
+      <div class="field"><label>履约方式 *</label><select><option>团长配送 + 自提</option><option>仅团长配送</option><option>仅自提</option></select></div>
+    </div>
+    <div class="alert"><span>⚠</span><span>成团判定规则、截团后是否可延长均待确认（Q-13 / Q-14）。</span></div>
+    <div class="mt12"><button class="btn">发布团购</button></div></div>`},
+  {n:'空态',t:'无团购：引导先维护商品再开团。',b:`
+   ${SB}<div class="navbar">团购管理</div><div class="body">
+    <div class="empty"><div class="ico">🎯</div><div class="h3">还没有发起团购</div>
+      <p class="p">先维护商品，然后选择一个商品发起团购。</p>
+      <div class="mt12"><button class="btn" style="width:auto;padding:0 18px">去维护商品</button></div></div>
+   </div>`},
+  {n:'未成团（已判定）',t:'明确未成团结果与后续动作（退款由系统触发）。',b:`
+   ${SB}<div class="navbar">团购管理</div><div class="body">
+    <div class="card"><div class="row"><div class="h3" style="font-size:13px">MM 瑞士卷 16 枚</div><span class="badge b-err">未成团</span></div>
+      <p class="small">32/50 份 · 10-14 21:00 截团</p>
+      <div class="bar"><i style="width:64%;background:var(--err)"></i></div>
+      <div class="divider"></div>
+      <div class="kv"><span>已付订单</span><b>32 笔</b></div>
+      <div class="kv"><span>退款处理</span><b style="color:var(--ok)">已全部发起（32/32）</b></div></div>
+    <div class="alert"><span>⚠</span><span>如有个别退款失败，此处会显示失败笔数与重试入口（AC-8.3）。</span></div>
+    <div class="mt12"><button class="btn ghost">查看退款明细</button></div></div>`}
+ ]},
+
+/* ---------- P-11 ---------- */
+{id:'P-11',side:'leader',title:'P-11 参团名单（团长）',fr:'FR-5.4',
+ desc:'团长可见的用户信息范围待确认【Q-16】（涉及隐私合规）。',
+ states:[
+  {n:'默认',t:'汇总 + 明细；联系方式按 Q-16 口径展示。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>参团名单</div><div class="body">
+    <div class="card"><div class="h3">MM 冷冻蓝莓 1.36kg</div>
+      <div class="kv"><span>已参团</span><b>30 / 50 份</b></div>
+      <div class="kv"><span>订单数</span><b>18 笔</b></div>
+      <div class="kv"><span>金额合计</span><b>¥2,697.00</b></div></div>
+    <div class="card"><table class="mini">
+      <tr><th>用户</th><th>数量</th><th>方式</th><th>状态</th></tr>
+      <tr><td>张小明<br><span class="small">138****8888</span></td><td>2</td><td>配送</td><td>已支付</td></tr>
+      <tr><td>李雷<br><span class="small">139****1234</span></td><td>1</td><td>自提</td><td>已支付</td></tr>
+      <tr><td>韩梅梅<br><span class="small">137****4321</span></td><td>3</td><td>配送</td><td>已支付</td></tr></table>
+      <p class="small" style="margin-top:6px">⚠ 团长可见字段范围待确认（Q-16），涉及隐私合规</p></div>
+    <div class="btn-row"><button class="btn ghost">导出名单</button><button class="btn">更新履约状态</button></div></div>`},
+  {n:'空态',t:'刚开团无人参团。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>参团名单</div><div class="body">
+    <div class="card"><div class="kv"><span>已参团</span><b>0 / 50 份</b></div></div>
+    <div class="empty"><div class="ico">👥</div><div class="h3">还没有人参团</div><p class="p">把团购分享到社群，吸引邻居参团。</p>
+    <div class="mt12"><button class="btn ghost" style="width:auto;padding:0 18px">分享团购</button></div></div></div>`},
+  {n:'加载中',t:'骨架屏。',b:`
+   ${SB}<div class="navbar"><span class="back">‹</span>参团名单</div><div class="body">
+    <div class="skel" style="height:64px;border-radius:10px;margin-bottom:8px"></div>
+    ${[1,2,3,4,5].map(()=>`<div class="skel" style="height:34px;margin-bottom:6px"></div>`).join('')}</div>`}
+ ]}
+];
+
+/* ============ 渲染 ============ */
+const navU=document.getElementById('nav-user'), navL=document.getElementById('nav-leader');
+PAGES.forEach((p,i)=>{
+  const b=document.createElement('button');
+  b.className='navbtn'; b.type='button'; b.role='tab'; b.textContent=`${p.id} ${p.title.replace(/^P-\d+\s/,'')}`;
+  b.setAttribute('aria-selected', i===0?'true':'false');
+  b.onclick=()=>select(i);
+  (p.side==='user'?navU:navL).appendChild(b);
+});
+function select(i){
+  const p=PAGES[i];
+  [...document.querySelectorAll('.navbtn')].forEach((b,j)=>b.setAttribute('aria-selected', j===i?'true':'false'));
+  document.getElementById('pg-title').textContent=p.title;
+  document.getElementById('pg-desc').textContent=p.desc;
+  document.getElementById('pg-fr').textContent='对应 '+p.fr+' · 共 '+p.states.length+' 个状态';
+  document.getElementById('states').innerHTML=p.states.map(s=>`
+    <section class="frame-wrap">
+      <div class="cap">${s.n} <span class="tag">${p.id}</span></div>
+      <div class="phone" role="img" aria-label="${p.id} ${s.n}">${s.b}</div>
+      <div class="note">${s.t}</div>
+    </section>`).join('');
+  window.scrollTo({top:0,behavior:'auto'});
+}
+select(0);
+</script>
+</body>
+</html>
